@@ -2,6 +2,7 @@ import pytest
 import json
 
 import ft_turing
+from copy import deepcopy
 
 from utils import check_data
 
@@ -26,12 +27,12 @@ def test_files(user_input):
 
 def test_machine_description(machine_description, user_input):
     with pytest.raises(AssertionError):
-        desctiption_copy = machine_description.copy()
+        desctiption_copy = deepcopy(machine_description)
         desctiption_copy.pop('states')
         check_data(desctiption_copy, user_input)
 
     with pytest.raises(AssertionError):
-        desctiption_copy = machine_description.copy()
+        desctiption_copy = deepcopy(machine_description)
         desctiption_copy["name"] = ""
         check_data(desctiption_copy, user_input)
     with pytest.raises(AssertionError):
@@ -39,7 +40,10 @@ def test_machine_description(machine_description, user_input):
         check_data(desctiption_copy, user_input)
 
     with pytest.raises(AssertionError):
-        desctiption_copy = machine_description.copy()
+        desctiption_copy = deepcopy(machine_description)
+        desctiption_copy["alphabet"].append(desctiption_copy["alphabet"][0])
+        check_data(desctiption_copy, user_input)
+    with pytest.raises(AssertionError):
         desctiption_copy["alphabet"] = ""
         check_data(desctiption_copy, user_input)
     with pytest.raises(AssertionError):
@@ -53,7 +57,7 @@ def test_machine_description(machine_description, user_input):
         check_data(desctiption_copy, user_input)
 
     with pytest.raises(AssertionError):
-        desctiption_copy = machine_description.copy()
+        desctiption_copy = deepcopy(machine_description)
         desctiption_copy["blank"] = 1
         check_data(desctiption_copy, user_input)
     with pytest.raises(AssertionError):
@@ -69,24 +73,27 @@ def test_machine_description(machine_description, user_input):
         check_data(machine_description, '')
 
     with pytest.raises(AssertionError):
-        desctiption_copy = machine_description.copy()
+        desctiption_copy = deepcopy(machine_description)
+        desctiption_copy["states"].append(desctiption_copy["states"][0])
+        check_data(desctiption_copy, user_input)
+    with pytest.raises(AssertionError):
         desctiption_copy["states"] = 1
         check_data(desctiption_copy, user_input)
     with pytest.raises(AssertionError):
-        desctiption_copy = machine_description.copy()
+        desctiption_copy = deepcopy(machine_description)
         desctiption_copy["states"] = []
         check_data(desctiption_copy, user_input)
     with pytest.raises(AssertionError):
-        desctiption_copy = machine_description.copy()
+        desctiption_copy = deepcopy(machine_description)
         desctiption_copy["states"] = ["scanright", ""]
         check_data(desctiption_copy, user_input)
     with pytest.raises(AssertionError):
-        desctiption_copy = machine_description.copy()
+        desctiption_copy = deepcopy(machine_description)
         desctiption_copy["states"] = ["scanright", 1]
         check_data(desctiption_copy, user_input)
 
     with pytest.raises(AssertionError):
-        desctiption_copy = machine_description.copy()
+        desctiption_copy = deepcopy(machine_description)
         desctiption_copy["initial"] = ""
         check_data(desctiption_copy, user_input)
     with pytest.raises(AssertionError):
@@ -100,7 +107,10 @@ def test_machine_description(machine_description, user_input):
         check_data(desctiption_copy, user_input)
 
     with pytest.raises(AssertionError):
-        desctiption_copy = machine_description.copy()
+        desctiption_copy = deepcopy(machine_description)
+        desctiption_copy["finals"].append(desctiption_copy["finals"][0])
+        check_data(desctiption_copy, user_input)
+    with pytest.raises(AssertionError):
         desctiption_copy["finals"] = "HALT"
         check_data(desctiption_copy, user_input)
     with pytest.raises(AssertionError):
@@ -109,6 +119,32 @@ def test_machine_description(machine_description, user_input):
     with pytest.raises(AssertionError):
         desctiption_copy["finals"] = ["HALT", "unknownstate"]
         check_data(desctiption_copy, user_input)
+    with pytest.raises(AssertionError):
+        desctiption_copy["finals"] = desctiption_copy["states"]
+        check_data(desctiption_copy, user_input)
+
+    with pytest.raises(AssertionError):
+        desctiption_copy = deepcopy(machine_description)
+        desctiption_copy["transitions"]["HALT"] = desctiption_copy["transitions"]["skip"]
+        check_data(desctiption_copy, user_input)
+    with pytest.raises(AssertionError):
+        desctiption_copy = deepcopy(machine_description)
+        desctiption_copy["transitions"]["unexpected_transition"] = desctiption_copy["transitions"]["skip"]
+        check_data(desctiption_copy, user_input)
+    with pytest.raises(AssertionError):
+        scanright = desctiption_copy["transitions"].pop("scanright")
+        check_data(desctiption_copy, user_input)
+    with pytest.raises(AssertionError):
+        desctiption_copy["transitions"].pop(
+            "unexpected_transition")
+        check_data(desctiption_copy, user_input)
+    with pytest.raises(AssertionError):
+        desctiption_copy["transitions"] = "scanright"
+        check_data(desctiption_copy, user_input)
+    with pytest.raises(AssertionError):
+        desctiption_copy["transitions"] = {}
+        check_data(desctiption_copy, user_input)
+
 
 
 def test_user_input(machine_description, user_input):
