@@ -9,15 +9,6 @@ def get_field(machine_description, field):
             f"machine description is missing the '{field}' field")
 
 
-def get_transition(transitions, state):
-    try:
-        return transitions[state]
-    except KeyError:
-        raise AssertionError(
-            f"machine description's 'transitions' field is missing the '{state}' transition"
-        )
-
-
 def check_data(machine_description, user_input):
 
     #########################  CHECK MACHINE DESCRIPTION #########################
@@ -73,10 +64,25 @@ def check_data(machine_description, user_input):
     transitions = get_field(machine_description, "transitions")
     assert (
         type(transitions) == dict
-        and set(transitions.keys()) == set([state for state in states if state not in finals])
+        and transitions.keys() == {state for state in states if state not in finals}
     ), ("'transitions' field should be a dictionary of state transitions."
         " The dictionary's keys should be part of the 'states'"
         " and shouldn't be part of the 'finals'")
+    for state_name, state_transitions in transitions.items():
+        assert (
+            type(state_transitions) == list
+            and len(state_transitions)
+            and all(
+                type(state_transition) == dict
+                and state_transition.keys() == {"read", "to_state", "write", "action"}
+                for state_transition in state_transitions
+            )
+        ), ("TODO")
+
+        read_values = [state_transition["read"]
+                       for state_transition in state_transitions]
+        assert len(read_values) == len(set(read_values)),\
+            f"'{state_name}' transition contains duplicate 'read' field values"
 
     ######################### CHECK USER INPUT #########################
 
