@@ -1,6 +1,18 @@
 import json
 
 
+def inverted_color(string):
+    return f"\033[;7m{string}\033[0m"
+
+
+def value_error(field_name, wrong, correct):
+    if wrong == "":
+        wrong = "empty"
+    correct = "\n - ".join([""] + correct)
+    return (f"{inverted_color(field_name)} has a wrong value {inverted_color(wrong)},"
+            f" it should respect the following conditions: {correct}")
+
+
 def get_field(machine_description, field):
     try:
         return machine_description[field]
@@ -64,8 +76,9 @@ def check_data(machine_description, user_input):
 
     # name
     name = get_field(machine_description, "name")
-    assert type(name) == str and len(name),\
-        "'name' field should be a non-empty string"
+    assert type(name) == str and len(name), value_error('name', name, [
+        "should be a non-empty string",
+    ])
 
     # alphabet
     alphabet = get_field(machine_description, "alphabet")
@@ -74,26 +87,34 @@ def check_data(machine_description, user_input):
         and len(alphabet)
         and all(type(symbol) == str and len(symbol) == 1 for symbol in alphabet)
         and len(alphabet) == len(set(alphabet))
-    ), ("'alphabet' field should be a non-empty list of unique symbols."
-        " Each symbol should consist of just 1 string character.")
+    ), value_error('alphabet', alphabet, [
+        "should be a non-empty list of unique symbols",
+        "each symbol should consist of just 1 string character",
+    ])
 
     # blank
     blank = get_field(machine_description, "blank")
-    assert blank in alphabet, "'blank' character must be part of the 'alphabet'"
+    assert blank in alphabet, value_error('blank', blank, [
+        f"should be a part of the 'alphabet': {alphabet}",
+    ])
 
     # states
     states = get_field(machine_description, "states")
     assert (
         type(states) == list
-        and len(states)
+        and len(states) > 1
         and all(type(state) == str and len(state) for state in states)
         and len(states) == len(set(states))
-    ), ("'states' field should be a non-empty list of unique machine states."
-        " Each state should be a non-empty string.")
+    ), value_error('states', states, [
+        "should be a list of at least 2 machine states",
+        "each state should be a unique non-empty string",
+    ])
 
     # initial
     initial = get_field(machine_description, "initial")
-    assert initial in states, "'initial' state must be part of the 'states'"
+    assert initial in states, value_error('initial', initial, [
+        f"should be a part of the 'states': {states}",
+    ])
 
     # finals
     finals = get_field(machine_description, "finals")
@@ -102,10 +123,12 @@ def check_data(machine_description, user_input):
         and len(finals)
         and all(final_state in states for final_state in finals)
         and len(finals) == len(set(finals))
-        and len(finals) < len(states)
-    ), ("'finals' field should be a non-empty list of unique final states."
-        " Each final state must be part of the 'states'."
-        " Number of final states should be less then the number of 'states'.")
+        and initial not in finals
+    ), value_error('finals', finals, [
+        "should be a non-empty list of unique final states",
+        f"each final state must be part of the 'states': {states}",
+        f"final states can't containt the 'initial' state: {initial}",
+    ])
 
     # transitions
     transitions = get_field(machine_description, "transitions")
@@ -113,8 +136,15 @@ def check_data(machine_description, user_input):
 
     ######################### CHECK USER INPUT #########################
 
-    assert user_input, "user input cannot be empty"
-    assert blank not in user_input, "user input cannot include a 'blank' character"
+    assert (
+        user_input
+        and blank not in user_input
+        and all(char in alphabet for char in user_input)
+    ), value_error('user_input', user_input, [
+        f"cannot be empty",
+        f"cannot include a 'blank' character: {blank}",
+        f"should be a part of the 'alphabet': {alphabet}",
+    ])
 
 
 def check_file_and_input(filename, user_input):

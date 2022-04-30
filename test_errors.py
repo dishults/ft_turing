@@ -1,10 +1,8 @@
-import pytest
-import json
-
 import ft_turing
 from copy import deepcopy
 
 from utils import check_data
+from test_resources import *
 
 
 class TestErrorMachineDescription:
@@ -72,6 +70,15 @@ class TestErrorMachineDescription:
             desctiption_copy["states"].append(desctiption_copy["states"][0])
             check_data(desctiption_copy, user_input)
         with pytest.raises(AssertionError):
+            desctiption_copy = deepcopy(machine_description)
+            state = desctiption_copy["states"][0]
+            desctiption_copy["states"] = [state]
+            desctiption_copy["finals"] = [state]
+            desctiption_copy["transitions"] = {
+                state: desctiption_copy["transitions"][state]
+            }
+            check_data(desctiption_copy, user_input)
+        with pytest.raises(AssertionError):
             desctiption_copy["states"] = 1
             check_data(desctiption_copy, user_input)
         with pytest.raises(AssertionError):
@@ -106,6 +113,11 @@ class TestErrorMachineDescription:
         with pytest.raises(AssertionError):
             desctiption_copy = deepcopy(machine_description)
             desctiption_copy["finals"].append(desctiption_copy["finals"][0])
+            check_data(desctiption_copy, user_input)
+        with pytest.raises(AssertionError):
+            desctiption_copy["finals"] = [
+                desctiption_copy["finals"][0], desctiption_copy["states"][0]
+            ]
             check_data(desctiption_copy, user_input)
         with pytest.raises(AssertionError):
             desctiption_copy["finals"] = "HALT"
@@ -228,3 +240,5 @@ class TestErrorUserInput:
             ft_turing.main('machine_descriptions/unary_sub.json', '')
         with pytest.raises(AssertionError):
             check_data(machine_description, user_input + '.')
+        with pytest.raises(AssertionError):
+            check_data(machine_description, user_input + '2')
