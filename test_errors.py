@@ -184,13 +184,7 @@ def test_transition(machine_description, user_input, state_transition):
         check_data(desctiption_copy, user_input)
 
 
-def test_state_transitions(machine_description, user_input, state_transition):
-    with pytest.raises(AssertionError):
-        desctiption_copy = deepcopy(machine_description)
-        desctiption_copy["transitions"]["subone"] = [state_transition, {
-            "read": state_transition["read"], "to_state": "HALT", "write": ".", "action": "LEFT"
-        }]
-        check_data(desctiption_copy, user_input)
+def test_state_transitions(machine_description, user_input):
     with pytest.raises(AssertionError):
         desctiption_copy = deepcopy(machine_description)
         desctiption_copy["transitions"]["subone"][1] = {}
@@ -202,6 +196,49 @@ def test_state_transitions(machine_description, user_input, state_transition):
     with pytest.raises(AssertionError):
         desctiption_copy = deepcopy(machine_description)
         desctiption_copy["transitions"]["subone"][0]["rewrite"] = "UP"
+        check_data(desctiption_copy, user_input)
+
+
+def test_state_transition(machine_description, user_input):
+    for readwrite in ("read", "write"):
+        with pytest.raises(AssertionError):
+            desctiption_copy = deepcopy(machine_description)
+            desctiption_copy["transitions"]["subone"][0][readwrite] = 1
+            check_data(desctiption_copy, user_input)
+        with pytest.raises(AssertionError):
+            desctiption_copy = deepcopy(machine_description)
+            desctiption_copy["transitions"]["subone"][0][readwrite] = "2"
+            check_data(desctiption_copy, user_input)
+
+    with pytest.raises(AssertionError):
+        desctiption_copy = deepcopy(machine_description)
+        desctiption_copy["transitions"]["subone"][0]["to_state"] = "unknown_state"
+        check_data(desctiption_copy, user_input)
+    with pytest.raises(AssertionError):
+        desctiption_copy = deepcopy(machine_description)
+        desctiption_copy["transitions"]["subone"][0]["to_state"] = None
+        check_data(desctiption_copy, user_input)
+
+    with pytest.raises(AssertionError):
+        desctiption_copy = deepcopy(machine_description)
+        desctiption_copy["transitions"]["subone"][0]["action"] = None
+        check_data(desctiption_copy, user_input)
+    with pytest.raises(AssertionError):
+        desctiption_copy = deepcopy(machine_description)
+        desctiption_copy["transitions"]["subone"][0]["action"] = "UP"
+        check_data(desctiption_copy, user_input)
+    with pytest.raises(AssertionError):
+        desctiption_copy = deepcopy(machine_description)
+        desctiption_copy["transitions"]["subone"][0]["action"] = "left"
+        check_data(desctiption_copy, user_input)
+
+
+def test_read_values(machine_description, user_input, state_transition):
+    with pytest.raises(AssertionError):
+        desctiption_copy = deepcopy(machine_description)
+        desctiption_copy["transitions"]["subone"] = [state_transition, {
+            "read": state_transition["read"], "to_state": "HALT", "write": ".", "action": "LEFT"
+        }]
         check_data(desctiption_copy, user_input)
 
 
