@@ -1,74 +1,77 @@
 import json
 
+from copy import deepcopy
 
-def inverted_color(string):
-    return f"\033[;7m{string}\033[0m"
-
-
-def value_error(field_name, wrong, correct):
-    if wrong == "":
-        wrong = "empty"
-    correct = "\n - ".join([""] + correct)
-    return (f"{inverted_color(field_name)} has a wrong value {inverted_color(wrong)},"
-            f" it should respect the following conditions: {correct}")
-
-
-def get_field(machine_description, field):
-    try:
-        return machine_description[field]
-    except KeyError:
-        raise AssertionError(
-            f"machine description is missing the '{field}' field")
+from .utils import *
 
 
 def check_transitions(transitions, alphabet, states, finals):
+    transitions_required_keys = states - finals
+    transition_required_keys = {"read", "to_state", "write", "action"}
+    allowed_actions = {"LEFT", "RIGHT"}
+    interstate_transitions = set()
+
+    # transitions
     assert (
         type(transitions) == dict
-        and transitions.keys() == {state for state in states if state not in finals}
-    ), ("'transitions' field should be a dictionary of state transitions."
-        " The dictionary's keys should be part of the 'states'"
-        " and shouldn't be part of the 'finals'")
+        and transitions.keys() == transitions_required_keys
+    ), value_error('transitions', None, [
+        f"should be a dictionary with the following keys: {transitions_required_keys}",
+    ])
+
     for state_name, state_transitions in transitions.items():
         # state transitions
         assert (
             type(state_transitions) == list
             and len(state_transitions)
-        ), f"transition for the '{state_name}' state should be a non-empty list of dictionaries"
+        ), (f"transition for the {inverted_color(state_name)} state should be"
+            " a non-empty list of dictionaries")
 
         # state transition
         for state_transition in state_transitions:
-            required_keys = {"read", "to_state", "write", "action"}
             assert (
                 type(state_transition) == dict
-                and state_transition.keys() == required_keys
-            ), (f"transition '{state_transition}' for the '{state_name}' state is incorrect,"
-                f" it should be a dictionary with the following keys: {required_keys}")
+                and state_transition.keys() == transition_required_keys
+            ), value_error('transition', state_transition, [
+                f"should be a dictionary with the following keys: {transition_required_keys}",
+            ])
 
             # read and write
             for readwrite in ("read", "write"):
                 value = state_transition[readwrite]
-                assert value in alphabet,\
-                    (f"'{readwrite}' value '{value}' is of the wrong type"
-                     f" or isn't a part of the 'alphabet': {alphabet}")
+                assert type(value) == str and value in alphabet, value_error(readwrite, value, [
+                    f" should be a part of the 'alphabet': {alphabet}",
+                ])
 
             # to_state
             to_state = state_transition["to_state"]
-            assert to_state in states,\
-                f"'to_state' value '{to_state}' isn't a part of the 'states': {states}"
+            assert type(to_state) == str and to_state in states, value_error('to_state', to_state, [
+                f" should be a part of the 'states': {states}",
+            ])
+            if to_state != state_name:
+                interstate_transitions.add(to_state)
 
             # action
             action = state_transition["action"]
-            assert action in {"LEFT", "RIGHT"},\
-                f"'action' has a wrong value '{action}', it should be either 'LEFT' or 'RIGHT'"
+            assert type(action) == str and action in allowed_actions, value_error('action', action, [
+                f" should be either of those: {allowed_actions}",
+            ])
 
-        # 'read' values
+        # unique 'read' values
         read_values = [state_transition["read"]
                        for state_transition in state_transitions]
         assert len(read_values) == len(set(read_values)),\
             f"'{state_name}' transition contains duplicate 'read' field values"
 
+    # interstate transitions
+    missing_interstate_transitions = states - interstate_transitions
+    assert not missing_interstate_transitions,\
+        (f"'transitions' is missing the following interstate {inverted_color('to_state')}"
+         f" transition(s): {missing_interstate_transitions}")
+
 
 def check_data(machine_description, user_input):
+    machine_description = deepcopy(machine_description)
 
     #########################  CHECK MACHINE DESCRIPTION #########################
 
@@ -91,10 +94,11 @@ def check_data(machine_description, user_input):
         "should be a non-empty list of unique symbols",
         "each symbol should consist of just 1 string character",
     ])
+    alphabet = set(alphabet)
 
     # blank
     blank = get_field(machine_description, "blank")
-    assert blank in alphabet, value_error('blank', blank, [
+    assert type(blank) == str and blank in alphabet, value_error('blank', blank, [
         f"should be a part of the 'alphabet': {alphabet}",
     ])
 
@@ -109,10 +113,11 @@ def check_data(machine_description, user_input):
         "should be a list of at least 2 machine states",
         "each state should be a unique non-empty string",
     ])
+    states = set(states)
 
     # initial
     initial = get_field(machine_description, "initial")
-    assert initial in states, value_error('initial', initial, [
+    assert type(initial) == str and initial in states, value_error('initial', initial, [
         f"should be a part of the 'states': {states}",
     ])
 
@@ -121,7 +126,7 @@ def check_data(machine_description, user_input):
     assert (
         type(finals) == list
         and len(finals)
-        and all(final_state in states for final_state in finals)
+        and all(type(final_state) == str and final_state in states for final_state in finals)
         and len(finals) == len(set(finals))
         and initial not in finals
     ), value_error('finals', finals, [
@@ -129,6 +134,7 @@ def check_data(machine_description, user_input):
         f"each final state must be part of the 'states': {states}",
         f"final states can't containt the 'initial' state: {initial}",
     ])
+    finals = set(finals)
 
     # transitions
     transitions = get_field(machine_description, "transitions")
@@ -139,7 +145,7 @@ def check_data(machine_description, user_input):
     assert (
         user_input
         and blank not in user_input
-        and all(char in alphabet for char in user_input)
+        and all(char in alphabet for char in set(user_input))
     ), value_error('user_input', user_input, [
         f"cannot be empty",
         f"cannot include a 'blank' character: {blank}",

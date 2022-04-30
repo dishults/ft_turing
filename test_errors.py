@@ -132,6 +132,25 @@ class TestErrorMachineDescription:
             desctiption_copy["finals"] = desctiption_copy["states"]
             check_data(desctiption_copy, user_input)
 
+    def test_unhashable(self, machine_description, user_input):
+        for field in {"name", "alphabet", "blank", "states", "initial", "finals"}:
+            with pytest.raises(AssertionError):
+                desctiption_copy = deepcopy(machine_description)
+                desctiption_copy[field] = {"1": 1}
+                check_data(desctiption_copy, user_input)
+
+        for field in ("alphabet", "finals", "states"):
+            with pytest.raises(AssertionError):
+                desctiption_copy = deepcopy(machine_description)
+                desctiption_copy[field][-1] = {"1": 1}
+                check_data(desctiption_copy, user_input)
+
+        for key in {"read", "to_state", "write", "action"}:
+            with pytest.raises(AssertionError):
+                desctiption_copy = deepcopy(machine_description)
+                desctiption_copy["transitions"]["scanright"][0][key] = {"1": 1}
+                check_data(desctiption_copy, user_input)
+
 
 class TestErrorTransition:
 
@@ -230,6 +249,22 @@ class TestErrorTransition:
             desctiption_copy["transitions"]["subone"] = [state_transition, {
                 "read": state_transition["read"], "to_state": "HALT", "write": ".", "action": "LEFT"
             }]
+            check_data(desctiption_copy, user_input)
+
+    def test_interstate_transitions(self, machine_description, user_input):
+        with pytest.raises(AssertionError):
+            desctiption_copy = deepcopy(machine_description)
+            desctiption_copy["transitions"]["eraseone"][1]["to_state"] = "scanright"
+            check_data(desctiption_copy, user_input)
+        with pytest.raises(AssertionError):
+            desctiption_copy = deepcopy(machine_description)
+            desctiption_copy["transitions"]["subone"][1]["to_state"] = "scanright"
+            check_data(desctiption_copy, user_input)
+        with pytest.raises(AssertionError):
+            desctiption_copy = deepcopy(machine_description)
+            new_state = "new_state"
+            desctiption_copy["states"].append(new_state)
+            desctiption_copy["finals"].append(new_state)
             check_data(desctiption_copy, user_input)
 
 

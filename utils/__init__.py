@@ -1,1 +1,1 @@
-from .data_parser import *
+from .checkers import *
