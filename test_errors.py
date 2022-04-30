@@ -133,22 +133,27 @@ class TestErrorMachineDescription:
             check_data(desctiption_copy, user_input)
 
     def test_unhashable(self, machine_description, user_input):
+        unhashable_variable = {"1": 1}
+
         for field in {"name", "alphabet", "blank", "states", "initial", "finals"}:
             with pytest.raises(AssertionError):
                 desctiption_copy = deepcopy(machine_description)
-                desctiption_copy[field] = {"1": 1}
+                desctiption_copy[field] = unhashable_variable
                 check_data(desctiption_copy, user_input)
 
         for field in ("alphabet", "finals", "states"):
             with pytest.raises(AssertionError):
                 desctiption_copy = deepcopy(machine_description)
-                desctiption_copy[field][-1] = {"1": 1}
+                desctiption_copy[field][-1] = unhashable_variable
                 check_data(desctiption_copy, user_input)
+
+        desctiption_copy = deepcopy(machine_description)
+        desctiption_copy["transitions"]["scanright"] = unhashable_variable
 
         for key in {"read", "to_state", "write", "action"}:
             with pytest.raises(AssertionError):
                 desctiption_copy = deepcopy(machine_description)
-                desctiption_copy["transitions"]["scanright"][0][key] = {"1": 1}
+                desctiption_copy["transitions"]["scanright"][0][key] = unhashable_variable
                 check_data(desctiption_copy, user_input)
 
 
