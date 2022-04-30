@@ -9,6 +9,53 @@ def get_field(machine_description, field):
             f"machine description is missing the '{field}' field")
 
 
+def check_transitions(transitions, alphabet, states, finals):
+    assert (
+        type(transitions) == dict
+        and transitions.keys() == {state for state in states if state not in finals}
+    ), ("'transitions' field should be a dictionary of state transitions."
+        " The dictionary's keys should be part of the 'states'"
+        " and shouldn't be part of the 'finals'")
+    for state_name, state_transitions in transitions.items():
+        # state transitions
+        assert (
+            type(state_transitions) == list
+            and len(state_transitions)
+        ), f"transition for the '{state_name}' state should be a non-empty list of dictionaries"
+
+        # state transition
+        for state_transition in state_transitions:
+            required_keys = {"read", "to_state", "write", "action"}
+            assert (
+                type(state_transition) == dict
+                and state_transition.keys() == required_keys
+            ), (f"transition '{state_transition}' for the '{state_name}' state is incorrect,"
+                f" it should be a dictionary with the following keys: {required_keys}")
+
+            # read and write
+            for readwrite in ("read", "write"):
+                value = state_transition[readwrite]
+                assert value in alphabet,\
+                    (f"'{readwrite}' value '{value}' is of the wrong type"
+                     f" or isn't a part of the 'alphabet': {alphabet}")
+
+            # to_state
+            to_state = state_transition["to_state"]
+            assert to_state in states,\
+                f"'to_state' value '{to_state}' isn't a part of the 'states': {states}"
+
+            # action
+            action = state_transition["action"]
+            assert action in {"LEFT", "RIGHT"},\
+                f"'action' has a wrong value '{action}', it should be either 'LEFT' or 'RIGHT'"
+
+        # 'read' values
+        read_values = [state_transition["read"]
+                       for state_transition in state_transitions]
+        assert len(read_values) == len(set(read_values)),\
+            f"'{state_name}' transition contains duplicate 'read' field values"
+
+
 def check_data(machine_description, user_input):
 
     #########################  CHECK MACHINE DESCRIPTION #########################
@@ -62,50 +109,7 @@ def check_data(machine_description, user_input):
 
     # transitions
     transitions = get_field(machine_description, "transitions")
-    assert (
-        type(transitions) == dict
-        and transitions.keys() == {state for state in states if state not in finals}
-    ), ("'transitions' field should be a dictionary of state transitions."
-        " The dictionary's keys should be part of the 'states'"
-        " and shouldn't be part of the 'finals'")
-    for state_name, state_transitions in transitions.items():
-        # state transitions
-        assert (
-            type(state_transitions) == list
-            and len(state_transitions)
-        ), f"transition for the '{state_name}' state should be a non-empty list of dictionaries"
-
-        # state transition
-        for state_transition in state_transitions:
-            required_keys = {"read", "to_state", "write", "action"}
-            assert (
-                type(state_transition) == dict
-                and state_transition.keys() == required_keys
-            ), (f"transition '{state_transition}' for the '{state_name}' state is incorrect,"
-                f" it should be a dictionary with the following keys: {required_keys}")
-
-            # read and write
-            for readwrite in ("read", "write"):
-                value = state_transition[readwrite]
-                assert value in alphabet,\
-                    (f"'{readwrite}' value '{value}' is of the wrong type"
-                     f" or isn't a part of the 'alphabet': {alphabet}")
-
-            # to_state
-            to_state = state_transition["to_state"]
-            assert to_state in states,\
-                f"'to_state' value '{to_state}' isn't a part of the 'states': {states}"
-
-            # action
-            action = state_transition["action"]
-            assert action in {"LEFT", "RIGHT"},\
-                f"'action' has a wrong value '{action}', it should be either 'LEFT' or 'RIGHT'"
-
-        # 'read' values
-        read_values = [state_transition["read"]
-                       for state_transition in state_transitions]
-        assert len(read_values) == len(set(read_values)),\
-            f"'{state_name}' transition contains duplicate 'read' field values"
+    check_transitions(transitions, alphabet, states, finals)
 
     ######################### CHECK USER INPUT #########################
 
