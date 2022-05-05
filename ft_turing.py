@@ -22,6 +22,10 @@ if __name__ == "__main__":
     try:
         main(args.jsonfile, args.input)
     except (FileNotFoundError, JSONDecodeError) as exc:
-        sys.exit(f"FILE ERROR: {exc}")
+        sys.exit(
+            "ERROR: make sure the file exists, it's not empty,"
+            " has a name and a correct json format and structure,"
+            " as well as all the necessary fields"
+        )
     except Exception as exc:
         sys.exit(f"ERROR: {exc}")

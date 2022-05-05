@@ -1,4 +1,5 @@
 import json
+import os
 
 from copy import deepcopy
 
@@ -154,6 +155,14 @@ def check_data(machine_description, user_input):
 
 
 def check_file_and_input(filename, user_input):
+    # Check file format
+    if not (
+        type(filename) == str
+        and filename.endswith('.json')
+        and len(os.path.basename(filename).split('.json')[0])
+    ):
+        raise json.JSONDecodeError("", "", 0)
+
     # Read file
     with open(filename, 'r') as json_file:
         machine_description = json.load(json_file)
