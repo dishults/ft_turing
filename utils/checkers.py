@@ -25,7 +25,7 @@ def check_transitions(transitions, alphabet, states, finals):
         assert (
             type(state_transitions) == list
             and len(state_transitions)
-        ), (f"transition for the {inverted_color(state_name)} state should be"
+        ), (f"transition for the {highlight(state_name)} state should be"
             " a non-empty list of dictionaries")
 
         # state transition
@@ -67,7 +67,7 @@ def check_transitions(transitions, alphabet, states, finals):
     # interstate transitions
     missing_interstate_transitions = states - interstate_transitions
     assert not missing_interstate_transitions,\
-        (f"'transitions' is missing the following interstate {inverted_color('to_state')}"
+        (f"'transitions' is missing the following interstate {highlight('to_state')}"
          f" transition(s): {missing_interstate_transitions}")
 
 

@@ -1,8 +1,8 @@
 import os
 
 
-def strigify_array(array):
-    return f"[ {', '.join(array)} ]"
+def strigify_array(array, sep=', ', padding=' '):
+    return f"[{padding}{sep.join(array)}{padding}]"
 
 
 def wrap_string(string, columns, outer='*', inner=' '):
@@ -14,13 +14,13 @@ def wrap_string(string, columns, outer='*', inner=' '):
 
     free_space = max(0, (columns - len(string)) // 2)
     string = f"{outer}{inner * (free_space - 1)}{string}{inner * (free_space - 1)}{outer}"
-    if columns > len(string):
+    if len(string) < columns:
         string = f"{string[:-1]}{inner * (columns - len(string))}{outer}"
 
     return "\n".join([outer_line(), inner_line(), string, inner_line(), outer_line()])
 
 
-def inverted_color(string):
+def highlight(string):
     return f"\033[;7m{string}\033[0m"
 
 
@@ -29,11 +29,11 @@ def value_error(field_name, wrong, conditions):
         wrong = str(wrong)
         if len(wrong) > 80:
             wrong = f"{wrong[:80]}..."
-        wrong = f" {inverted_color(wrong)}"
+        wrong = f" {highlight(wrong)}"
     else:
         wrong = ""
     conditions = "\n - ".join([""] + conditions)
-    return (f"{inverted_color(field_name)} has a wrong value{wrong},"
+    return (f"{highlight(field_name)} has a wrong value{wrong},"
             f" it should respect the following condition(s): {conditions}")
 
 
