@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 
 import argparse
-from json import JSONDecodeError
 import sys
 
+from json import JSONDecodeError
+
 from utils import check_file_and_input
-from turing_machine import run_machine
+from turing_machine import print_machine_description_info, run_machine
 
 
 def main(jsonfile, user_input):
     machine_description = check_file_and_input(jsonfile, user_input)
+    print_machine_description_info(jsonfile, machine_description)
     run_machine(machine_description, user_input)
 
 

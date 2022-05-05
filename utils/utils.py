@@ -1,3 +1,25 @@
+import os
+
+
+def strigify_array(array):
+    return f"[ {', '.join(array)} ]"
+
+
+def wrap_string(string, columns, outer='*', inner=' '):
+    def outer_line():
+        return outer * columns
+
+    def inner_line():
+        return f"{outer}{inner * (columns - 2)}{outer}"
+
+    free_space = max(0, (columns - len(string)) // 2)
+    string = f"{outer}{inner * (free_space - 1)}{string}{inner * (free_space - 1)}{outer}"
+    if columns > len(string):
+        string = f"{string[:-1]}{inner * (columns - len(string))}{outer}"
+
+    return f"{outer_line()}{inner_line()}{string}{inner_line()}{outer_line()}"
+
+
 def inverted_color(string):
     return f"\033[;7m{string}\033[0m"
 
@@ -21,3 +43,14 @@ def get_field(machine_description, field):
     except KeyError:
         raise AssertionError(
             f"machine description is missing the '{field}' field")
+
+
+def get_terminal_size():
+    try:
+        return os.get_terminal_size()
+    except Exception:
+        return [80, 24]
+
+
+def get_file_name(file_path):
+    return os.path.basename(file_path).split('.json')[0]
