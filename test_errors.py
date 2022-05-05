@@ -291,3 +291,18 @@ class TestErrorUserInput:
             check_data(machine_description, user_input + '.')
         with pytest.raises(AssertionError):
             check_data(machine_description, user_input + '2')
+
+
+class TestErrorRunMachine:
+
+    def test_run_machine(self, machine_description):
+        with pytest.raises(RuntimeError):
+            ft_turing.main('machine_descriptions/unary_sub.json', '111')
+        with pytest.raises(RuntimeError):
+            ft_turing.main('machine_descriptions/unary_sub.json', '1-1-')
+        with pytest.raises(RuntimeError):
+            ft_turing.main('machine_descriptions/unary_sub.json', '11=')
+        with pytest.raises(RuntimeError):
+            desctiption_copy = deepcopy(machine_description)
+            desctiption_copy["initial"] = "eraseone"
+            ft_turing.main('machine_descriptions/unary_sub.json', '=')

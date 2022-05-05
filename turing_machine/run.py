@@ -14,6 +14,7 @@ def get_transitions_dict(transitions):
 
 
 def stringify_tape(tape, i, blank, max_length=20):
+    tape = tape[:]
     tape[i] = highlight(tape[i])
     if len(tape) < max_length:
         tape += [blank] * (max_length - len(tape))
@@ -29,9 +30,18 @@ def run_machine(md, tape):
     transitions = get_transitions_dict(md["transitions"])
     tape = list(tape)
     i = 0
-    while i >= 0 and i <= len(tape):
+    while i >= 0 and i < len(tape):
         read = tape[i]
-        transition = transitions[state][read]
+
+        try:
+            transition = transitions[state][read]
+        except KeyError:
+            raise RuntimeError(
+                f"state {highlight(state)} doesn't have a {highlight(read)} transition."
+                " Change your input or machine description's initial state,"
+                " or add the the missing transition."
+            )
+
         print(stringify_tape(tape, i, md["blank"]),
               stringify_transition(state, transition))
         tape[i] = transition["write"]
@@ -46,9 +56,6 @@ def run_machine(md, tape):
             break
 
     if state not in finals:
-        raise RuntimeError("\n - ".join([
-            "End of tape.",
-            f"tape: {tape}",
-            f"state: {state}",
-            f"didn't reach any of the final states: {md['finals']}",
-        ]))
+        raise RuntimeError(
+            f"End of tape. Didn't reach any of the final states: {md['finals']}"
+        )
