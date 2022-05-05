@@ -17,7 +17,7 @@ def wrap_string(string, columns, outer='*', inner=' '):
     if columns > len(string):
         string = f"{string[:-1]}{inner * (columns - len(string))}{outer}"
 
-    return f"{outer_line()}{inner_line()}{string}{inner_line()}{outer_line()}"
+    return "\n".join([outer_line(), inner_line(), string, inner_line(), outer_line()])
 
 
 def inverted_color(string):

@@ -22,7 +22,3 @@ def print_machine_description_info(md_name, machine_description):
                   f"{state_transition['action']})")
 
     print('*' * columns)
-
-
-def run_machine(machine_description, user_input):
-    pass
