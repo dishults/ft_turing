@@ -13,14 +13,9 @@ def get_transitions_dict(transitions):
     return transitions_dict
 
 
-def stringify_tape(tape, i, blank, max_length=20):
+def stringify_tape(tape, i):
     tape = tape[:]
     tape[i] = highlight(tape[i])
-    if len(tape) < max_length:
-        tape += [blank] * (max_length - len(tape))
-    elif len(tape) > max_length:
-        # TODO truncate
-        pass
     return strigify_array(tape, sep='', padding='')
 
 
@@ -28,7 +23,7 @@ def run_machine(md, tape):
     state = md["initial"]
     finals = set(md["finals"])
     transitions = get_transitions_dict(md["transitions"])
-    tape = list(tape)
+    tape = list(tape) + [md["blank"]] * 10
     i = 0
     while i >= 0 and i < len(tape):
         read = tape[i]
@@ -42,8 +37,7 @@ def run_machine(md, tape):
                 " or add the the missing transition."
             )
 
-        print(stringify_tape(tape, i, md["blank"]),
-              stringify_transition(state, transition))
+        print(stringify_tape(tape, i), stringify_transition(state, transition))
         tape[i] = transition["write"]
         state = transition["to_state"]
 
@@ -53,6 +47,7 @@ def run_machine(md, tape):
             i -= 1
 
         if state in finals:
+            print(stringify_tape(tape, i))
             break
 
     if state not in finals:

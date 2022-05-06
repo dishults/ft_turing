@@ -24,7 +24,7 @@
     "skip": [
       { "read": ".", "to_state": "scanright", "write": ".", "action": "RIGHT" },
       { "read": "1", "to_state": "skip", "write": ".", "action": "RIGHT" },
-      { "read": "=", "to_state": "HALT", "write": "+", "action": "LEFT" }
+      { "read": "=", "to_state": "HALT", "write": ".", "action": "LEFT" }
     ]
   }
 }
