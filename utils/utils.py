@@ -50,7 +50,3 @@ def get_terminal_size():
         return os.get_terminal_size()
     except Exception:
         return [80, 24]
-
-
-def get_file_name(file_path):
-    return os.path.basename(file_path).split('.json')[0]

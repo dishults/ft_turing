@@ -16,8 +16,6 @@ class TestErrorMachineDescription:
         with pytest.raises(json.JSONDecodeError):
             ft_turing.main('test_resources/unary_sub.py', user_input)
         with pytest.raises(json.JSONDecodeError):
-            ft_turing.main('test_resources/.json', user_input)
-        with pytest.raises(json.JSONDecodeError):
             ft_turing.main('test_errors.py', user_input)
         with pytest.raises(AssertionError):
             ft_turing.main('test_resources/error_incomplete.json', user_input)

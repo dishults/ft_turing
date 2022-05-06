@@ -156,11 +156,7 @@ def check_data(machine_description, user_input):
 
 def check_file_and_input(filename, user_input):
     # Check file format
-    if not (
-        type(filename) == str
-        and filename.endswith('.json')
-        and len(os.path.basename(filename).split('.json')[0])
-    ):
+    if not (type(filename) == str and filename.endswith('.json')):
         raise json.JSONDecodeError("", "", 0)
 
     # Read file
