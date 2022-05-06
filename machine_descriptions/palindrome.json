@@ -1,6 +1,6 @@
 {
   "name": "palindrome",
-  "alphabet": [ "0", "1", "*", "x", ".", "n", "y" ],
+  "alphabet": [ "0", "1", "*", ".", "n", "y" ],
   "blank": ".",
   "states": [ "start", "scanright_0", "scanright_1", "check_0", "check_1", "scanleft", "no", "yes", "HALT" ],
   "initial": "start",
@@ -31,12 +31,12 @@
 
     "check_0": [
       { "read": "0", "to_state": "scanleft", "write": "*", "action": "LEFT" },
-      { "read": "1", "to_state": "no", "write": "x", "action": "RIGHT" },
+      { "read": "1", "to_state": "no", "write": "1", "action": "RIGHT" },
       { "read": "*", "to_state": "scanleft", "write": "*", "action": "RIGHT" }
     ],
 
     "check_1": [
-      { "read": "0", "to_state": "no", "write": "x", "action": "RIGHT" },
+      { "read": "0", "to_state": "no", "write": "0", "action": "RIGHT" },
       { "read": "1", "to_state": "scanleft", "write": "*", "action": "LEFT" },
       { "read": "*", "to_state": "scanleft", "write": "*", "action": "RIGHT" }
     ],
@@ -56,7 +56,6 @@
     "no": [
       { "read": "0", "to_state": "no", "write": "*", "action": "RIGHT" },
       { "read": "1", "to_state": "no", "write": "*", "action": "RIGHT" },
-      { "read": "x", "to_state": "no", "write": "*", "action": "RIGHT" },
       { "read": "*", "to_state": "no", "write": "*", "action": "RIGHT" },
       { "read": ".", "to_state": "HALT", "write": "n", "action": "LEFT" }
     ]
