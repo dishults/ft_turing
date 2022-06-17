@@ -11,8 +11,7 @@
           { "read": "0", "to_state": "scanright_0", "write": "*", "action": "RIGHT" },
           { "read": "1", "to_state": "no", "write": "-", "action": "RIGHT" },
           { "read": "*", "to_state": "no", "write": "*", "action": "RIGHT" },
-          { "read": "-", "to_state": "yes", "write": "-", "action": "RIGHT" },
-          { "read": ".", "to_state": "no", "write": ".", "action": "LEFT" }
+          { "read": "-", "to_state": "yes", "write": "-", "action": "RIGHT" }
         ],
     
         "scanright_0": [
@@ -32,13 +31,11 @@
         "scanleft": [
           { "read": "0", "to_state": "scanleft", "write": "0", "action": "LEFT" },
           { "read": "1", "to_state": "scanleft", "write": "1", "action": "LEFT" },
-          { "read": "*", "to_state": "start", "write": "*", "action": "RIGHT" },
-          { "read": ".", "to_state": "scanleft", "write": ".", "action": "LEFT" }
+          { "read": "*", "to_state": "start", "write": "*", "action": "RIGHT" }
         ],
     
         "yes": [
           { "read": "-", "to_state": "yes", "write": "-", "action": "RIGHT" },
-          { "read": "*", "to_state": "no", "write": "*", "action": "RIGHT" },
           { "read": ".", "to_state": "HALT", "write": "y", "action": "LEFT" }
         ],
     
