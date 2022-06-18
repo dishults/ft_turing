@@ -66,7 +66,7 @@ def check_transitions(transitions, alphabet, states, finals):
 
     # interstate transitions
     missing_interstate_transitions = states - interstate_transitions
-    assert not missing_interstate_transitions,\
+    assert len(states - finals) == 1 or not missing_interstate_transitions,\
         (f"'transitions' is missing the following interstate {highlight('to_state')}"
          f" transition(s): {missing_interstate_transitions}")
 
